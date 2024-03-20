@@ -10,31 +10,36 @@
 #include <stdlib.h>
 #include <time.h>
 
-MatrizListaLigada *criarMatriz(int num_linhas, int num_colunas) {
-    // Inicializa a semente do gerador de números aleatórios
-    srand(time(NULL));
 
-    MatrizListaLigada *matriz = (MatrizListaLigada*)malloc(sizeof(MatrizListaLigada));
-    if (matriz == NULL) {
-        printf("Erro ao alocar memoria para a matriz.\n");
-        exit(EXIT_FAILURE);
+void escreverMatrizParaArquivo(MatrizListaLigada *matriz, const char *nomearquivo) {
+    FILE *arquivo = fopen(nomearquivo, "a+");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo. Nao existe. ESCREVER MATRIZ PARA ARQUIVO\n");
+        return;
+    } else {
+        printf("\n");
     }
-    matriz->linhas = (Linha*)malloc(num_linhas * sizeof(Linha));
-    if (matriz->linhas == NULL) {
-        printf("Erro ao alocar memoria para as linhas da matriz.\n");
-        exit(EXIT_FAILURE);
-    }
-    matriz->num_linhas = num_linhas;
-    matriz->num_colunas = num_colunas;
-    for (int i = 0; i < num_linhas; i++) {
-        matriz->linhas[i] = *criarLinha();
-        for (int j = 0; j < num_colunas; j++) {
-            int valor = rand() % 1000; 
-            inserirElemento(matriz, i, j, valor);
+    fprintf(arquivo,"Matriz gerada!\n");
+    for (int i = 0; i < matriz->num_linhas; i++) {
+        No *current = matriz->linhas[i].head;
+        for (int j = 0; j < matriz->num_colunas; j++) {
+            if (current != NULL) {
+                fprintf(arquivo, "%d", current->data);
+                if (j < matriz->num_colunas - 1 && current->next != NULL)
+                    fprintf(arquivo, ";");
+                current = current->next;
+            } else {
+                fprintf(arquivo, "0");
+                if (j < matriz->num_colunas - 1)
+                    fprintf(arquivo, ";");
+            }
         }
+        fprintf(arquivo, "\n");
     }
-    return matriz;
+    fclose(arquivo);
 }
+
+
 
 void inserirElemento(MatrizListaLigada *matriz, int linha_index, int col_index, int data) {
     if (linha_index < 0 || linha_index >= matriz->num_linhas || col_index < 0 || col_index >= matriz->num_colunas) {
@@ -57,10 +62,10 @@ void inserirElemento(MatrizListaLigada *matriz, int linha_index, int col_index, 
     matriz->linhas[linha_index].comprimento++;
 }
 
-void carregarMatrizDeArquivo(MatrizListaLigada *matriz, const char *documento) {
-    FILE *arquivo = fopen(documento, "r");
+void carregarMatrizDeArquivo(MatrizListaLigada *matriz, const char *nomearquivo) {
+    FILE *arquivo = fopen(nomearquivo, "r");
     if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo.\n");
+        printf("Erro ao abrir o arquivo para leitura. CARREGAR MATRIZ DE ARQUIVO\n");
         return;
     }
     int linha_index = 0;
@@ -108,10 +113,9 @@ void mostrarMatriz(MatrizListaLigada *matriz) {
 // }
 
 int calcularMaxSoma(MatrizListaLigada *matriz) {
-    // Matriz auxiliar para armazenar a soma máxima até cada posição (linha, coluna)
     int maxSum[matriz->num_linhas][matriz->num_colunas];
 
-    // Inicializa a primeira linha e coluna da matriz auxiliar com os valores da primeira linha da matriz original
+
     maxSum[0][0] = matriz->linhas[0].head->data;
     for (int i = 1; i < matriz->num_colunas; i++) {
         maxSum[0][i] = maxSum[0][i - 1] + matriz->linhas[0].head->next->data;
@@ -120,10 +124,10 @@ int calcularMaxSoma(MatrizListaLigada *matriz) {
         maxSum[i][0] = maxSum[i - 1][0] + matriz->linhas[i].head->data;
     }
 
-    // Calcula a soma máxima possível em cada posição da matriz auxiliar
+
     for (int i = 1; i < matriz->num_linhas; i++) {
         for (int j = 1; j < matriz->num_colunas; j++) {
-            // Verifica a soma máxima possível considerando os valores da posição atual
+
             maxSum[i][j] = matriz->linhas[i].head->data + maxSum[i - 1][j];
             if (maxSum[i][j - 1] > maxSum[i][j]) {
                 maxSum[i][j] = maxSum[i][j - 1];
@@ -131,19 +135,18 @@ int calcularMaxSoma(MatrizListaLigada *matriz) {
         }
     }
 
-    // A última posição da matriz auxiliar contém a soma máxima possível
+
     return maxSum[matriz->num_linhas - 1][matriz->num_colunas - 1];
 }
 
 void alterarElemento(MatrizListaLigada *matriz, int linha_index, int col_index, int novo_valor) {
     if (linha_index < 0 || linha_index >= matriz->num_linhas || col_index < 0 || col_index >= matriz->num_colunas) {
-        printf("Índices inválidos.\n");
+        printf("Índices inválidos. ALTERAR ELEMENTO\n");
         return;
     }
     No *current = matriz->linhas[linha_index].head;
     for (int i = 0; i < col_index; i++) {
         if (current == NULL) {
-            printf("Índices inválidos.\n");
             return;
         }
         current = current->next;
@@ -155,13 +158,13 @@ void alterarElemento(MatrizListaLigada *matriz, int linha_index, int col_index, 
 
 void inserirLinha(MatrizListaLigada *matriz, int posicao) {
     if (posicao < 0 || posicao > matriz->num_linhas) {
-        printf("Posição inválida.\n");
+        printf("Posição inválida. INSERIR LINHA\n");
         return;
     }
     Linha *novaLinha = criarLinha();
     matriz->linhas = realloc(matriz->linhas, (matriz->num_linhas + 1) * sizeof(Linha));
     if (matriz->linhas == NULL) {
-        printf("Erro ao realocar memória para as linhas da matriz.\n");
+        printf("Erro ao realocar memória para as linhas da matriz. INSERIR LINHA2\n");
         exit(EXIT_FAILURE);
     }
     for (int i = matriz->num_linhas; i > posicao; i--) {
@@ -171,13 +174,45 @@ void inserirLinha(MatrizListaLigada *matriz, int posicao) {
     matriz->num_linhas++;
 }
 
+void LinhaInserida(MatrizListaLigada *matriz, const char *nomearquivo, int posicao) {
+    inserirLinha(matriz, posicao);
+
+    FILE *arquivo = fopen(nomearquivo, "a");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo para escrita.\n");
+        return;
+    }
+    fprintf(arquivo, "\nMatriz com linha inserida!\n");
+    for (int i = 0; i < matriz->num_linhas; i++) {
+        No *current = matriz->linhas[i].head;
+        for (int j = 0; j < matriz->num_colunas; j++) {
+            if (current != NULL) {
+                fprintf(arquivo, "%d", current->data);
+                if (j < matriz->num_colunas - 1 && current->next != NULL)
+                    fprintf(arquivo, ";");
+                current = current->next;
+            } else {
+                // If there are no more elements in the line, print 0 or some default value
+                fprintf(arquivo, "0");
+                if (j < matriz->num_colunas - 1)
+                    fprintf(arquivo, ";");
+            }
+        }
+        fprintf(arquivo, "\n");
+    }
+
+    // Close the file
+    fclose(arquivo);
+}
+
+
 void inserirColuna(MatrizListaLigada *matriz, int posicao) {
     if (posicao < 0 || posicao > matriz->num_colunas) {
-        printf("Posição inválida.\n");
+        printf("Posição inválida. INSERIR COLUNA\n");
         return;
     }
     for (int i = 0; i < matriz->num_linhas; i++) {
-        inserirElemento(matriz, i, posicao, 0); // Insere zeros em todas as posições da nova coluna
+        inserirElemento(matriz, i, posicao, 0);
     }
     matriz->num_colunas++;
 }
@@ -199,10 +234,38 @@ void removerLinha(MatrizListaLigada *matriz, int posicao) {
     matriz->num_linhas--;
 }
 
+void LinhaRemovida(MatrizListaLigada *matriz, const char *nomearquivo, int posicao) {
+    removerLinha(matriz, posicao);
+
+    FILE *arquivo = fopen(nomearquivo, "a");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo para escrita.\n");
+        return;
+    }
+    fprintf(arquivo,"\nMatriz com a linha removida!\n");
+    for (int i = 0; i < matriz->num_linhas; i++) {
+        No *current = matriz->linhas[i].head;
+        for (int j = 0; j < matriz->num_colunas; j++) {
+            if (current != NULL) {
+                fprintf(arquivo, "%d", current->data);
+                if (j < matriz->num_colunas - 1 && current->next != NULL)
+                    fprintf(arquivo, ";");
+                current = current->next;
+            } else {
+                // If there are no more elements in the line, print 0 or some default value
+                fprintf(arquivo, "0");
+                if (j < matriz->num_colunas - 1)
+                    fprintf(arquivo, ";");
+            }
+        }
+        fprintf(arquivo, "\n");
+    }
+    fclose(arquivo);
+}
 
 void removerColuna(MatrizListaLigada *matriz, int posicao) {
     if (posicao < 0 || posicao >= matriz->num_colunas) {
-        printf("Posição inválida.\n");
+        printf("Posição inválida. REMOVER COLUNA \n");
         return;
     }
     
@@ -214,25 +277,82 @@ void removerColuna(MatrizListaLigada *matriz, int posicao) {
 
         while (current != NULL && count != posicao) {
             anterior = current;
-            current = current->next; // Corrigido para 'next'
+            current = current->next;
             count++;
         }
 
         if (count == posicao) {
-            if (anterior == NULL) { // Se for o primeiro elemento
-                linha->head = current->next; // Corrigido para 'next'
+            if (anterior == NULL) {
+                linha->head = current->next;
             } else {
-                anterior->next = current->next; // Corrigido para 'next'
+                anterior->next = current->next;
             }
             free(current);
-            linha->comprimento--; // Corrigido para 'comprimento'
+            linha->comprimento--;
         } else {
-            printf("Posição inválida.\n");
+            printf("Posição inválida. REMOVER COLUNA 2\n");
         }
     }
     
     matriz->num_colunas--;
 }
 
+void ColunaRemovida(MatrizListaLigada *matriz, const char *nomearquivo, int posicao) {
+    removerColuna(matriz, posicao);
 
+    FILE *arquivo = fopen(nomearquivo, "a");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo para escrita.\n");
+        return;
+    }
+    fprintf(arquivo, "\nMatriz com Coluna Removida!\n");
+    for (int i = 0; i < matriz->num_linhas; i++) {
+        No *current = matriz->linhas[i].head;
+        for (int j = 0; j < matriz->num_colunas; j++) {
+            if (current != NULL) {
+                fprintf(arquivo, "%d", current->data);
+                if (j < matriz->num_colunas - 1 && current->next != NULL)
+                    fprintf(arquivo, ";");
+                current = current->next;
+            } else {
+                fprintf(arquivo, "0");
+                if (j < matriz->num_colunas - 1)
+                    fprintf(arquivo, ";");
+            }
+        }
+        fprintf(arquivo, "\n");
+    }
+
+    // Close the file
+    fclose(arquivo);
+}
+
+MatrizListaLigada *criarMatriz(int num_linhas, int num_colunas) {
+    srand(time(NULL));
+
+    MatrizListaLigada *matriz = (MatrizListaLigada*)malloc(sizeof(MatrizListaLigada));
+    if (matriz == NULL) {
+        printf("Erro ao alocar memória para a matriz.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    matriz->linhas = (Linha*)malloc(num_linhas * sizeof(Linha));
+    if (matriz->linhas == NULL) {
+        printf("Erro ao alocar memória para as linhas da matriz.\n");
+        free(matriz);
+        exit(EXIT_FAILURE);
+    }
+
+    matriz->num_linhas = num_linhas;
+    matriz->num_colunas = num_colunas;
+
+    for (int i = 0; i < num_linhas; i++) {
+        matriz->linhas[i] = *criarLinha();
+        for (int j = 0; j < num_colunas; j++) {
+            int valor = rand() % 1000;
+            inserirElemento(matriz, i, j, valor);
+        }
+    }
+    return matriz;
+}
 

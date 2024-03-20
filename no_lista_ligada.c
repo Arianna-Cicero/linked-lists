@@ -12,7 +12,7 @@
 No *criarNo(int data) {
     No *novoNo = (No*)malloc(sizeof(No));
     if (novoNo == NULL) {
-        printf("Erro ao alocar memória para o novo nó.\n");
+        printf("Erro ao alocar memória para o novo nó. CRIAR NO\n");
         exit(EXIT_FAILURE);
     }
     novoNo->data = data;

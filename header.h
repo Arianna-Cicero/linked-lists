@@ -6,8 +6,8 @@
  * @date    Março 2024
  *********************************************************************/
 
-#ifndef MATRIZ_LISTA_LIGADA_H
-#define MATRIZ_LISTA_LIGADA_H
+#ifndef HEADER_H
+#define HEADER_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,14 +41,17 @@ Linha *criarLinha();
 // Funções para manipulação de matriz
 MatrizListaLigada *criarMatriz(int num_linhas, int num_colunas);
 void inserirElemento(MatrizListaLigada *matriz, int linha_index, int col_index, int data);
-void inserirColuna(MatrizListaLigada *matriz, int posicao);
-void inserirLinha(MatrizListaLigada *matriz, int posicao);
-void carregarMatrizDeArquivo(MatrizListaLigada *matriz, const char *nomearquivo);
+void escreverMatrizParaArquivo(MatrizListaLigada *matriz, const char *nomearquivo);
 void mostrarMatriz(MatrizListaLigada *matriz);
+void LinhaRemovida(MatrizListaLigada *matriz, const char *nomearquivo, int posicao);
+void ColunaRemovida(MatrizListaLigada *matriz, const char *nomearquivo, int posicao);
+void LinhaInserida(MatrizListaLigada *matriz, const char *nomearquivo, int posicao);
+
+/*
 void libertarMatriz(MatrizListaLigada *matriz);
 int calcularMaxSoma(MatrizListaLigada *matriz);
 void removerColuna(MatrizListaLigada *matriz, int posicao);
 void removerLinha(MatrizListaLigada *matriz, int posicao);
-void alterarElemento(MatrizListaLigada *matriz, int linha_index, int col_index, int novo_valor);
+void alterarElemento(MatrizListaLigada *matriz, int linha_index, int col_index, int novo_valor);*/
 
 #endif 
