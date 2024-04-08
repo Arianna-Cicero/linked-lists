@@ -1,0 +1,3 @@
+/home/arianna/CLionProjects/linked-lists/cmake-build-debug/CMakeFiles/linked_lists.dir
+/home/arianna/CLionProjects/linked-lists/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/arianna/CLionProjects/linked-lists/cmake-build-debug/CMakeFiles/rebuild_cache.dir
